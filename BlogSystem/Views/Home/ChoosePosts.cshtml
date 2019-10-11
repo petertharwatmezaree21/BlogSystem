@@ -1,0 +1,48 @@
+﻿@model List<Post>
+@using System.Text.RegularExpressions;
+@{
+    ViewBag.Title = "ChoosePosts";
+    Layout = null;
+}
+
+<div class="container">
+    <div class="row">
+        <div id="AllPosts">
+            @foreach (var post in Model)
+            {
+                int NumberOfWord = 5;
+                string yourbody = "";
+
+                foreach (string word in post.Body.Split(' '))
+                {
+                    if (NumberOfWord >= 0)
+                    {
+                        yourbody += word + " ";
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    NumberOfWord--;
+                }
+                <div class="col-md-4">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">@post.Title <span class="pull-right">@post.Category.Title</span></div>
+                        @{
+                            var Finaloutput = Regex.Replace(yourbody, "<.*?>", String.Empty);
+                            Finaloutput = Finaloutput.Trim();
+
+                        }
+
+                        <div class="panel-body" style="max-height:1000px;">@Finaloutput ....</div>
+                        <div class="panel-footer"><a href="/Home/ReadPost?PostId=@post.Id">Read more...</a><span class="pull-right">By: @post.Author</span></div>
+                    </div>
+                </div>
+
+            }
+
+        </div>
+
+    </div>
+</div>
+

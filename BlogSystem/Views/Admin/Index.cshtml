@@ -1,0 +1,156 @@
+﻿@model List<Post>
+@using System.Text.RegularExpressions;
+@{
+    ViewBag.Title = "Index";
+
+
+}
+<link href="~/Content/DataTables/css/dataTables.bootstrap.css" rel="stylesheet" />
+<h2>All Posts</h2>
+
+@if (Model.Count <= 0)
+{
+    <div class="container">
+
+        <div class="row">
+            <div class="alert alert-danger">
+                @User.Identity.Name, You Dont have any Post
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <table class="table table-bordered" id="YourPosts">
+        <thead>
+            <tr>
+                <th>
+                    Your Posts
+                </th>
+                <th>
+                    Category
+                </th>
+                <th>
+                    Puplish Date
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var post in Model)
+            {
+                int NumberOfWord = 6;
+                string yourbody = "";
+
+                foreach (string word in post.Body.Split(' '))
+                {
+                    if (NumberOfWord >= 0)
+                    {
+                        yourbody += word + " ";
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    NumberOfWord--;
+                }
+                <tr>
+                    <td>
+                        @{
+                            var Finaloutput = Regex.Replace(yourbody, "<.*?>", String.Empty);
+                            Finaloutput = Finaloutput.Trim();
+
+                        }
+                        @Finaloutput
+                    </td>
+                    <td>
+                        @post.Category.Title
+                    </td>
+                    <td>
+                        @post.PublishedDate
+                    </td>
+                    <td>
+
+                        <a href="/Admin/Edit?id=@post.Id" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-edit"></span> Edit
+                        </a>
+                        <a data-postid="@post.Id" href="/Admin/Delete?id=@post.Id" class="btn btn-danger deleteBtn">
+                            <span class="glyphicon glyphicon-trash"></span> Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+
+
+    <a href="/Admin/Create" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Add A New Post</a>
+
+@section scripts
+{
+
+    <script src="~/Scripts/DataTables/jquery.dataTables.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.bootstrap.js"></script>
+
+
+
+    <script>
+    $(document).ready(function () {
+        $('#YourPosts').DataTable();
+        $(".deleteBtn").click(function (e) {
+            alert($(this).attr("data-postid"));
+            try {
+
+                swal({
+                    title: "Confirm?",
+                    text: "This Action will delete your post !!",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+          .then((willDelete) => {
+              if (willDelete) {
+                  $.ajax({
+                      type: "POST",
+                      url: "/Admin/Delete",
+                      data: { PostId : $(this).attr("data-postid") }
+
+                  }).done(function (data) {
+                      swal("Your post has been deleted!", {
+                          icon: "success",
+                      });
+                      setTimeout(function () {
+                          window.location.href = data
+                      },1000)
+
+                  })
+                      .fail(function (jqXHR, textStatus, errorThrown) {
+                          console.log(jqXHR);
+                      });
+
+
+              } else {
+                  swal("Your imaginary file is safe!");
+              }
+
+          });
+
+
+
+            }
+              catch(ex)
+            {
+                  alert("Exception");
+              }
+            e.preventDefault();
+
+        });
+
+    });
+    </script>
+
+}

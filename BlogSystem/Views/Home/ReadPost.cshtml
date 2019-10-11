@@ -1,0 +1,98 @@
+﻿@model Post
+@{
+    ViewBag.Title = "ReadPost";
+}
+
+<div class="container">
+    <div class="row">
+        <h1>@Model.Title</h1>
+        <h4 class="">Posted By: @Model.Author</h4>
+        <br />
+
+        <h5>@Html.Raw(Model.Body)</h5>
+        <br />
+        <br />
+        <br />
+
+        <div id="AllComment">
+            @{ Html.RenderAction("DesignComment",new { Commnets=Model.Comments,PostId=Model.Id});}
+        </div>
+        <br />
+        <br />
+        <label>Add Your Comment : </label>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <textarea required="required" id="CommentArea" class="form-control" rows="5" style="min-width:50%">Enter Your Comment ...</textarea>
+            <br />
+            <button class="btn btn-success" id="AddComment"><span class="glyphicon glyphicon-plus"></span> Add Comment</button>
+        }
+        else
+        {
+            <textarea disabled="disabled" title="You Can't add comment must to bo logged first"  id="CommentArea" rows="7"  class="form-control" style="min-width:50%">Enter Your Comment ...</textarea>
+            <br />
+            <button class="btn btn-success" disabled="disabled" id="AddComment"><span class="glyphicon glyphicon-plus"></span>Add Comment</button>
+
+        }
+    </div>
+</div>
+
+@section scripts{
+    @*<script src="~/Scripts/jquery-3.3.1.js"></script>*@
+
+    <script>
+        $(document).ready(function () {
+            $("#CommentArea").focus(function () {
+                $(this).val("");
+            });
+
+
+            $("#AddComment").click(function(){
+                var postId=@Model.Id;
+                var userName ="@User.Identity.Name";
+                var comment =  $("#CommentArea").val();
+
+                if(comment !="" && comment !="Enter Your Comment ...")
+                {
+                    
+                    $("#CommentArea").html("");
+                    var currentComment = {
+                        Username:userName,
+                        Body:comment,
+                        CommentDate:"@DateTime.Now",
+                        PostId:postId
+                    };
+
+                    $.ajax({
+                        type:"POST",
+                        url:"/Home/AddComment",
+                        contentType: "application/json",
+                        data:JSON.stringify({ comment: currentComment }),
+                
+                    }).done(function(response){
+
+                        $("#AllComment").html(response);
+                        $("#CommentArea").focus();
+                        $("#CommentArea").css("border","none");
+                    }).fail(function(jqXHR,textStatus,errorThrown){
+                        alert("Fail");
+
+                    });
+
+
+                }
+                else
+                {
+                    $("#CommentArea").attr("title","Please Add a commnet");
+                    $("#CommentArea").css("border","1px solid red");
+                }
+                 
+
+            });
+
+        });
+
+    </script>
+}
+
+
+

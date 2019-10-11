@@ -1,0 +1,52 @@
+﻿@model List<Comment>
+@{
+    ViewBag.Title = "DesignComment";
+    Layout = null;
+}
+
+<link href="~/Content/CommentStyle.css" rel="stylesheet" />
+
+
+@if (Model.Any() != true)
+{
+<div class="container">
+
+    <div class="row">
+        <div class="alert alert-info" style="font-weight:bold;">
+            This post has not comments, Be the first one 
+        </div>
+    </div>
+</div>
+}
+else
+{
+
+    foreach (var comment in Model)
+    {
+        <div class="comments-container">
+            <ul id="comments-list" class="comments-list">
+                <li>
+                    <div class="comment-main-level">
+                        <!-- Avatar -->
+                        <div class="comment-avatar"><img src="http://i9.photobucket.com/albums/a88/creaticode/avatar_1_zps8e1c80cd.jpg" alt=""></div>
+                        <!-- Contenedor del Comentario -->
+                        <div class="comment-box">
+                            <div class="comment-head">
+                                <h6 class="comment-name by-author">@comment.Username</h6>
+                                <span style="padding-top:7px;">@comment.CommentDate</span>
+                                <i class="fa fa-reply"></i>
+                                <i class="fa fa-heart"></i>
+                            </div>
+                            <div class="comment-content">
+                                @comment.Body
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    }
+}
+
+
+<!-- Contenedor Principal -->
